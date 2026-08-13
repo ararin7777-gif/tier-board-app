@@ -1,0 +1,129 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* ニュートラル(背景・テキスト・枠線) — ベースパレット */
+  --color-neutral-0: #ffffff;
+  --color-neutral-50: #f7f7f5;
+  --color-neutral-100: #efefea;
+  --color-neutral-200: #e3e3dc;
+  --color-neutral-300: #c9c9bf;
+  --color-neutral-400: #a3a399;
+  --color-neutral-500: #7a7a70;
+  --color-neutral-600: #5c5c54;
+  --color-neutral-700: #44443e;
+  --color-neutral-800: #2e2e2a;
+  --color-neutral-900: #1c1c19;
+  --color-neutral-950: #131311;
+
+  /* アクセント(オリーブグリーン) — ベースパレット */
+  --color-accent-50: #f4f6ec;
+  --color-accent-100: #e6ead2;
+  --color-accent-200: #cfd8a8;
+  --color-accent-300: #b3c078;
+  --color-accent-400: #96a855;
+  --color-accent-500: #7a8f3e;
+  --color-accent-600: #62732f;
+  --color-accent-700: #4c5926;
+
+  /* Tierのデフォルト配色(暖色→寒色、テーマ共通) */
+  --color-tier-s: #e4572e;
+  --color-tier-a: #f2a93c;
+  --color-tier-b: #e8c547;
+  --color-tier-c: #6fa8a0;
+  --color-tier-d: #7c93b0;
+
+  /* セマンティックトークン — ライトモード(shadcn/ui標準の変数名に合わせる) */
+  --background: var(--color-neutral-50);
+  --foreground: var(--color-neutral-900);
+  --card: var(--color-neutral-0);
+  --card-foreground: var(--color-neutral-900);
+  --popover: var(--color-neutral-0);
+  --popover-foreground: var(--color-neutral-900);
+  --primary: var(--color-accent-500);
+  --primary-foreground: var(--color-neutral-0);
+  --secondary: var(--color-neutral-100);
+  --secondary-foreground: var(--color-neutral-900);
+  --muted: var(--color-neutral-100);
+  --muted-foreground: var(--color-neutral-600);
+  --accent: var(--color-neutral-100);
+  --accent-foreground: var(--color-neutral-900);
+  --destructive: #c0533e;
+  --destructive-foreground: var(--color-neutral-0);
+  --border: var(--color-neutral-200);
+  --input: var(--color-neutral-200);
+  --ring: var(--color-accent-500);
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* セマンティックトークン — ダークモード */
+  --background: var(--color-neutral-900);
+  --foreground: var(--color-neutral-50);
+  --card: var(--color-neutral-800);
+  --card-foreground: var(--color-neutral-50);
+  --popover: var(--color-neutral-800);
+  --popover-foreground: var(--color-neutral-50);
+  --primary: var(--color-accent-400);
+  --primary-foreground: var(--color-neutral-950);
+  --secondary: var(--color-neutral-800);
+  --secondary-foreground: var(--color-neutral-50);
+  --muted: var(--color-neutral-800);
+  --muted-foreground: var(--color-neutral-400);
+  --accent: var(--color-neutral-800);
+  --accent-foreground: var(--color-neutral-50);
+  --destructive: #d9694f;
+  --destructive-foreground: var(--color-neutral-0);
+  --border: var(--color-neutral-700);
+  --input: var(--color-neutral-700);
+  --ring: var(--color-accent-400);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-tier-s: var(--color-tier-s);
+  --color-tier-a: var(--color-tier-a);
+  --color-tier-b: var(--color-tier-b);
+  --color-tier-c: var(--color-tier-c);
+  --color-tier-d: var(--color-tier-d);
+  --font-sans: var(--font-noto-sans-jp);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
