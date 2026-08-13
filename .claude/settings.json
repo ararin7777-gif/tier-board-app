@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Edit(~/.claude/skills/grill-me/**)"
+      "Edit(~/.claude/skills/grill-me/**)",
+      "Bash(curl -sS http://localhost:3000/login)"
     ]
   }
 }
