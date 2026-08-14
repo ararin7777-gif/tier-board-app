@@ -60,7 +60,26 @@ create trigger tier_boards_set_updated_at
   execute function set_updated_at();
 
 -- =========================================
--- 3) RLS(行レベルセキュリティ)有効化
+-- 3) 権限付与(GRANT)
+-- =========================================
+-- 「Automatically expose new tables」をオフにしている場合、
+-- テーブルを作成しただけではPostgREST(Data API)からアクセスできない。
+-- RLSポリシーは「行単位の絞り込み」であり、その手前の「テーブルへの
+-- アクセスそのものを許可するか」はGRANTで別途与える必要がある。
+
+grant usage on schema public to anon, authenticated;
+
+grant select, insert, update, delete on public.tier_boards to authenticated;
+grant select, insert, update, delete on public.tiers to authenticated;
+grant select, insert, update, delete on public.items to authenticated;
+
+-- 共有リンク(未ログインの第三者)がis_public=trueのボードを読めるようにする
+grant select on public.tier_boards to anon;
+grant select on public.tiers to anon;
+grant select on public.items to anon;
+
+-- =========================================
+-- 4) RLS(行レベルセキュリティ)有効化
 -- =========================================
 
 alter table tier_boards enable row level security;

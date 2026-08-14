@@ -40,7 +40,7 @@ export default function SignupPage() {
       email: values.email,
       password: values.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/boards`,
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/boards`,
       },
     });
 

@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Edit(~/.claude/skills/grill-me/**)",
-      "Bash(curl -sS http://localhost:3000/login)"
+      "Bash(curl -sS http://localhost:3000/login)",
+      "Bash(git commit -m ' *)",
+      "Bash(curl -sS -o /dev/null -w \"login: %{http_code}\\\\n\" http://localhost:3000/login)"
     ]
   }
 }
