@@ -62,6 +62,70 @@ export async function deleteTier(boardId: string, tierId: string) {
   revalidatePath(`/boards/${boardId}`);
 }
 
+export async function createItems(
+  boardId: string,
+  items: { name: string; imageUrl: string }[],
+) {
+  if (items.length === 0) return;
+  const supabase = await createClient();
+
+  const { data: existing } = await supabase
+    .from("items")
+    .select("position")
+    .eq("board_id", boardId)
+    .is("tier_id", null)
+    .order("position", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  let nextPosition = (existing?.position ?? -10) + 10;
+  const rows = items.map((item) => {
+    const row = {
+      board_id: boardId,
+      tier_id: null,
+      name: item.name,
+      image_url: item.imageUrl,
+      position: nextPosition,
+    };
+    nextPosition += 10;
+    return row;
+  });
+
+  const { error } = await supabase.from("items").insert(rows);
+
+  if (error) {
+    console.error("createItems failed", error);
+    throw new Error("アイテムの登録に失敗しました");
+  }
+
+  revalidatePath(`/boards/${boardId}`);
+}
+
+export async function deleteItem(
+  boardId: string,
+  itemId: string,
+  imageUrl: string | null,
+) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("items").delete().eq("id", itemId);
+
+  if (error) {
+    console.error("deleteItem failed", error);
+    throw new Error("アイテムの削除に失敗しました");
+  }
+
+  if (imageUrl) {
+    const marker = "/item-images/";
+    const idx = imageUrl.indexOf(marker);
+    if (idx !== -1) {
+      const path = imageUrl.slice(idx + marker.length);
+      await supabase.storage.from("item-images").remove([path]);
+    }
+  }
+
+  revalidatePath(`/boards/${boardId}`);
+}
+
 export async function moveTier(
   boardId: string,
   tierId: string,
