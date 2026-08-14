@@ -1,7 +1,46 @@
 "use server";
 
+import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+
+export async function togglePublic(boardId: string, isPublic: boolean) {
+  const supabase = await createClient();
+
+  let shareSlug: string | null = null;
+
+  if (isPublic) {
+    const { data: board, error: fetchError } = await supabase
+      .from("tier_boards")
+      .select("share_slug")
+      .eq("id", boardId)
+      .single();
+
+    if (fetchError) {
+      console.error("togglePublic: fetch failed", fetchError);
+      throw new Error("公開設定の更新に失敗しました");
+    }
+
+    shareSlug = board.share_slug ?? nanoid(10);
+  }
+
+  const { error } = await supabase
+    .from("tier_boards")
+    .update(
+      isPublic ? { is_public: true, share_slug: shareSlug } : { is_public: false },
+    )
+    .eq("id", boardId);
+
+  if (error) {
+    console.error("togglePublic: update failed", error);
+    throw new Error("公開設定の更新に失敗しました");
+  }
+
+  revalidatePath(`/boards/${boardId}`);
+  revalidatePath("/boards");
+
+  return { shareSlug };
+}
 
 export async function addTier(boardId: string) {
   const supabase = await createClient();
@@ -121,6 +160,31 @@ export async function deleteItem(
       const path = imageUrl.slice(idx + marker.length);
       await supabase.storage.from("item-images").remove([path]);
     }
+  }
+
+  revalidatePath(`/boards/${boardId}`);
+}
+
+export async function moveItems(
+  boardId: string,
+  updates: { id: string; tierId: string | null; position: number }[],
+) {
+  if (updates.length === 0) return;
+  const supabase = await createClient();
+
+  const results = await Promise.all(
+    updates.map((u) =>
+      supabase
+        .from("items")
+        .update({ tier_id: u.tierId, position: u.position })
+        .eq("id", u.id),
+    ),
+  );
+
+  const failed = results.find((r) => r.error);
+  if (failed?.error) {
+    console.error("moveItems failed", failed.error);
+    throw new Error("アイテムの移動に失敗しました");
   }
 
   revalidatePath(`/boards/${boardId}`);

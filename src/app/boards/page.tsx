@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DeleteBoardButton } from "@/components/delete-board-button";
 import { SignOutButton } from "@/components/sign-out-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function BoardsPage() {
@@ -32,6 +33,7 @@ export default async function BoardsPage() {
               新規作成
             </Button>
           </form>
+          <ThemeToggle />
           <SignOutButton />
         </div>
       </header>

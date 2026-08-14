@@ -26,7 +26,10 @@ export function ItemCard({
   };
 
   return (
-    <div className="group relative flex w-16 flex-col items-center gap-1">
+    <div
+      title={item.name}
+      className="group relative flex w-16 flex-col items-center gap-1"
+    >
       <div className="relative size-16 overflow-hidden rounded-lg bg-secondary ring-1 ring-border">
         {item.image_url ? (
           <Image

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { createClient } from "@/lib/supabase/client";
 
 const schema = z.object({
@@ -80,7 +81,10 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-full flex-1 items-center justify-center bg-background px-4 py-16">
+    <div className="relative flex min-h-full flex-1 items-center justify-center bg-background px-4 py-16">
+      <div className="absolute right-4 top-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-sm rounded-2xl shadow-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Tier表メーカー</CardTitle>
