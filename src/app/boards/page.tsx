@@ -22,7 +22,7 @@ export default async function BoardsPage() {
   // RLSにより「自分のTier表(公開/非公開問わず)」+「他ユーザーの公開Tier表」が返る
   const { data: boards } = await supabase
     .from("tier_boards")
-    .select("id, title, is_public, updated_at, user_id")
+    .select("id, title, is_public, allow_public_edit, updated_at, user_id")
     .order("updated_at", { ascending: false });
 
   return (
@@ -69,12 +69,14 @@ export default async function BoardsPage() {
                 </div>
                 <div className="flex items-start justify-between gap-2 pr-8">
                   <h2 className="font-medium">{board.title}</h2>
-                  <Badge
-                    variant={board.is_public ? "default" : "secondary"}
-                    className="shrink-0"
-                  >
-                    {board.is_public ? "公開" : "非公開"}
-                  </Badge>
+                  <div className="flex shrink-0 flex-wrap justify-end gap-1">
+                    <Badge variant={board.is_public ? "default" : "secondary"}>
+                      {board.is_public ? "公開" : "非公開"}
+                    </Badge>
+                    {board.is_public && board.allow_public_edit && (
+                      <Badge variant="outline">編集可</Badge>
+                    )}
+                  </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   更新:{" "}
