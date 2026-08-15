@@ -127,17 +127,22 @@ export default async function BoardsPage() {
                         プレビューなし
                       </div>
                     )}
-                  </div>
-                  <div className="flex items-start justify-between gap-2 pr-8">
-                    <h2 className="font-medium">{board.title}</h2>
-                    <div className="flex shrink-0 items-center gap-1">
-                      <Badge variant={board.is_public ? "default" : "secondary"}>
+                    <div className="absolute left-2 top-2 flex items-center gap-1">
+                      <Badge
+                        variant={board.is_public ? "default" : "secondary"}
+                        className="shadow-sm"
+                      >
                         {board.is_public ? "公開" : "非公開"}
                       </Badge>
                       {board.is_public && board.allow_public_edit && (
-                        <Badge variant="outline">編集可</Badge>
+                        <Badge variant="outline" className="bg-card shadow-sm">
+                          編集可
+                        </Badge>
                       )}
                     </div>
+                  </div>
+                  <div className="flex items-start justify-between gap-2 pr-8">
+                    <h2 className="font-medium">{board.title}</h2>
                   </div>
                   <p className="text-xs text-muted-foreground">
                     更新:{" "}
