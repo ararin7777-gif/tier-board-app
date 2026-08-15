@@ -119,6 +119,23 @@ export async function deleteTier(boardId: string, tierId: string) {
   revalidatePath(`/boards/${boardId}`);
 }
 
+export async function setCoverImage(boardId: string, imageUrl: string | null) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("tier_boards")
+    .update({ cover_image_url: imageUrl })
+    .eq("id", boardId);
+
+  if (error) {
+    console.error("setCoverImage: update failed", error);
+    throw new Error("カバー画像の更新に失敗しました");
+  }
+
+  revalidatePath(`/boards/${boardId}`);
+  revalidatePath("/boards");
+}
+
 export async function createItems(
   boardId: string,
   items: { name: string; imageUrl: string }[],

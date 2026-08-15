@@ -12,6 +12,7 @@ create table if not exists tier_boards (
   title text not null default '無題のTier表',
   is_public boolean not null default false,
   allow_public_edit boolean not null default false,
+  cover_image_url text,
   share_slug text unique,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -19,6 +20,7 @@ create table if not exists tier_boards (
 
 -- 既存テーブルに対する追加(初回作成時は上のcreate tableで既にカラムが存在するため実質no-op)
 alter table tier_boards add column if not exists allow_public_edit boolean not null default false;
+alter table tier_boards add column if not exists cover_image_url text;
 
 -- Tier(段)
 create table if not exists tiers (

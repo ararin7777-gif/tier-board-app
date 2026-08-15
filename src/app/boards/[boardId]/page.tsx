@@ -5,6 +5,7 @@ import { AddItemsDialog } from "@/components/add-items-dialog";
 import { AddTierButton } from "@/components/add-tier-button";
 import { BoardEditor } from "@/components/board-editor";
 import { BoardTitle } from "@/components/board-title";
+import { CoverImageControl } from "@/components/cover-image-control";
 import { PublicToggle } from "@/components/public-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { createClient } from "@/lib/supabase/server";
@@ -26,7 +27,9 @@ export default async function BoardEditorPage({
   // RLS上、ここで取得できるのは「自分のTier表」または「他ユーザーの公開Tier表」のみ
   const { data: board } = await supabase
     .from("tier_boards")
-    .select("id, title, is_public, share_slug, allow_public_edit, user_id")
+    .select(
+      "id, title, is_public, share_slug, allow_public_edit, cover_image_url, user_id",
+    )
     .eq("id", boardId)
     .single();
 
@@ -84,14 +87,21 @@ export default async function BoardEditorPage({
             </span>
           </div>
         )}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {isOwner && (
-            <PublicToggle
-              boardId={board.id}
-              initialIsPublic={board.is_public}
-              initialShareSlug={board.share_slug}
-              initialAllowPublicEdit={board.allow_public_edit}
-            />
+            <>
+              <CoverImageControl
+                boardId={board.id}
+                userId={user.id}
+                initialCoverImageUrl={board.cover_image_url}
+              />
+              <PublicToggle
+                boardId={board.id}
+                initialIsPublic={board.is_public}
+                initialShareSlug={board.share_slug}
+                initialAllowPublicEdit={board.allow_public_edit}
+              />
+            </>
           )}
           <AddItemsDialog boardId={board.id} userId={user.id} />
           <ThemeToggle />
