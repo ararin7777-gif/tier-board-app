@@ -19,10 +19,10 @@ export default async function BoardsPage() {
     redirect("/login");
   }
 
+  // RLSにより「自分のTier表(公開/非公開問わず)」+「他ユーザーの公開Tier表」が返る
   const { data: boards } = await supabase
     .from("tier_boards")
-    .select("id, title, is_public, updated_at")
-    .eq("user_id", user.id)
+    .select("id, title, is_public, updated_at, user_id")
     .order("updated_at", { ascending: false });
 
   return (
@@ -81,9 +81,11 @@ export default async function BoardsPage() {
                   {new Date(board.updated_at).toLocaleDateString("ja-JP")}
                 </p>
               </Link>
-              <div className="absolute right-3 top-3">
-                <DeleteBoardButton boardId={board.id} boardTitle={board.title} />
-              </div>
+              {board.user_id === user.id && (
+                <div className="absolute right-3 top-3">
+                  <DeleteBoardButton boardId={board.id} boardTitle={board.title} />
+                </div>
+              )}
             </div>
           ))}
         </div>

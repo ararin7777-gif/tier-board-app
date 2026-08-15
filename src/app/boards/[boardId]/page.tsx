@@ -1,6 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { AddItemsDialog } from "@/components/add-items-dialog";
 import { AddTierButton } from "@/components/add-tier-button";
 import { BoardEditor } from "@/components/board-editor";
@@ -23,14 +23,22 @@ export default async function BoardEditorPage({
     notFound();
   }
 
+  // RLS上、ここで取得できるのは「自分のTier表」または「他ユーザーの公開Tier表」のみ
   const { data: board } = await supabase
     .from("tier_boards")
-    .select("id, title, is_public, share_slug")
+    .select("id, title, is_public, share_slug, user_id")
     .eq("id", boardId)
-    .eq("user_id", user.id)
     .single();
 
   if (!board) {
+    notFound();
+  }
+
+  // 他ユーザーの公開Tier表を直接開いた場合は、編集画面ではなく閲覧専用の共有ビューへ案内する
+  if (board.user_id !== user.id) {
+    if (board.is_public && board.share_slug) {
+      redirect(`/share/${board.share_slug}`);
+    }
     notFound();
   }
 
