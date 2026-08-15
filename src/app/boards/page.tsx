@@ -1,5 +1,6 @@
 import { Plus } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createBoard } from "./actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,9 +15,14 @@ export default async function BoardsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    redirect("/login");
+  }
+
   const { data: boards } = await supabase
     .from("tier_boards")
     .select("id, title, is_public, updated_at")
+    .eq("user_id", user.id)
     .order("updated_at", { ascending: false });
 
   return (

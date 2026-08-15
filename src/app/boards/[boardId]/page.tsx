@@ -19,13 +19,18 @@ export default async function BoardEditorPage({
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    notFound();
+  }
+
   const { data: board } = await supabase
     .from("tier_boards")
     .select("id, title, is_public, share_slug")
     .eq("id", boardId)
+    .eq("user_id", user.id)
     .single();
 
-  if (!board || !user) {
+  if (!board) {
     notFound();
   }
 
