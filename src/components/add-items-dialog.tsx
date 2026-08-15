@@ -25,6 +25,8 @@ type PendingItem = {
   previewUrl: string;
 };
 
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
 export function AddItemsDialog({
   boardId,
   userId,
@@ -39,7 +41,16 @@ export function AddItemsDialog({
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     const supabase = createClient();
-    const fileArray = Array.from(files);
+
+    const allFiles = Array.from(files);
+    const fileArray = allFiles.filter((f) => ACCEPTED_TYPES.includes(f.type));
+    const rejectedCount = allFiles.length - fileArray.length;
+    if (rejectedCount > 0) {
+      toast.error(
+        `${rejectedCount}件は対応していない画像形式のためスキップしました(JPEG・PNG・WebP・GIFのみ対応。iPhoneのHEIC形式は非対応です)`,
+      );
+    }
+    if (fileArray.length === 0) return;
 
     const newItems: PendingItem[] = fileArray.map((file) => ({
       id: crypto.randomUUID(),
@@ -140,7 +151,7 @@ export function AddItemsDialog({
           画像を選択(複数可)
           <input
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp,image/gif"
             multiple
             className="hidden"
             onChange={(e) => handleFiles(e.target.files)}

@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import Image from "next/image";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { deleteItem } from "@/app/boards/[boardId]/actions";
 
@@ -14,6 +14,7 @@ export function ItemCard({
   item: { id: string; name: string; image_url: string | null };
 }) {
   const [isPending, startTransition] = useTransition();
+  const [imageFailed, setImageFailed] = useState(false);
 
   const handleDelete = () => {
     startTransition(async () => {
@@ -31,13 +32,14 @@ export function ItemCard({
       className="group relative flex w-16 flex-col items-center gap-1"
     >
       <div className="relative size-16 overflow-hidden rounded-lg bg-secondary ring-1 ring-border">
-        {item.image_url ? (
+        {item.image_url && !imageFailed ? (
           <Image
             src={item.image_url}
             alt={item.name}
             fill
             sizes="64px"
             className="object-cover"
+            onError={() => setImageFailed(true)}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-lg font-semibold text-muted-foreground">

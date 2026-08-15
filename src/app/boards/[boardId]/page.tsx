@@ -77,31 +77,33 @@ export default async function BoardEditorPage({
       </div>
 
       <header className="flex flex-wrap items-center justify-between gap-4">
-        {isOwner ? (
-          <BoardTitle boardId={board.id} initialTitle={board.title} />
-        ) : (
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold">{board.title}</h1>
-            <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
-              他のユーザーの公開Tier表(編集可)
-            </span>
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {isOwner ? (
+            <BoardTitle boardId={board.id} initialTitle={board.title} />
+          ) : (
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-semibold">{board.title}</h1>
+              <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
+                他のユーザーの公開Tier表(編集可)
+              </span>
+            </div>
+          )}
+          {isOwner && (
+            <CoverImageControl
+              boardId={board.id}
+              userId={user.id}
+              initialCoverImageUrl={board.cover_image_url}
+            />
+          )}
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           {isOwner && (
-            <>
-              <CoverImageControl
-                boardId={board.id}
-                userId={user.id}
-                initialCoverImageUrl={board.cover_image_url}
-              />
-              <PublicToggle
-                boardId={board.id}
-                initialIsPublic={board.is_public}
-                initialShareSlug={board.share_slug}
-                initialAllowPublicEdit={board.allow_public_edit}
-              />
-            </>
+            <PublicToggle
+              boardId={board.id}
+              initialIsPublic={board.is_public}
+              initialShareSlug={board.share_slug}
+              initialAllowPublicEdit={board.allow_public_edit}
+            />
           )}
           <AddItemsDialog boardId={board.id} userId={user.id} />
           <ThemeToggle />
