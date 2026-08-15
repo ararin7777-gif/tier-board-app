@@ -26,7 +26,7 @@ export default async function BoardEditorPage({
   // RLS上、ここで取得できるのは「自分のTier表」または「他ユーザーの公開Tier表」のみ
   const { data: board } = await supabase
     .from("tier_boards")
-    .select("id, title, is_public, share_slug, user_id")
+    .select("id, title, is_public, share_slug, allow_public_edit, user_id")
     .eq("id", boardId)
     .single();
 
@@ -34,12 +34,18 @@ export default async function BoardEditorPage({
     notFound();
   }
 
-  // 他ユーザーの公開Tier表を直接開いた場合は、編集画面ではなく閲覧専用の共有ビューへ案内する
-  if (board.user_id !== user.id) {
-    if (board.is_public && board.share_slug) {
-      redirect(`/share/${board.share_slug}`);
+  const isOwner = board.user_id === user.id;
+
+  // 他ユーザーの公開Tier表で、編集許可(allow_public_edit)が無い場合は
+  // 編集画面ではなく閲覧専用の共有ビューへ案内する
+  if (!isOwner) {
+    if (!board.is_public) {
+      notFound();
     }
-    notFound();
+    if (!board.allow_public_edit) {
+      if (board.share_slug) redirect(`/share/${board.share_slug}`);
+      notFound();
+    }
   }
 
   const [{ data: tiers }, { data: items }] = await Promise.all([
@@ -68,13 +74,25 @@ export default async function BoardEditorPage({
       </div>
 
       <header className="flex flex-wrap items-center justify-between gap-4">
-        <BoardTitle boardId={board.id} initialTitle={board.title} />
+        {isOwner ? (
+          <BoardTitle boardId={board.id} initialTitle={board.title} />
+        ) : (
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-semibold">{board.title}</h1>
+            <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
+              他のユーザーの公開Tier表(編集可)
+            </span>
+          </div>
+        )}
         <div className="flex items-center gap-2">
-          <PublicToggle
-            boardId={board.id}
-            initialIsPublic={board.is_public}
-            initialShareSlug={board.share_slug}
-          />
+          {isOwner && (
+            <PublicToggle
+              boardId={board.id}
+              initialIsPublic={board.is_public}
+              initialShareSlug={board.share_slug}
+              initialAllowPublicEdit={board.allow_public_edit}
+            />
+          )}
           <AddItemsDialog boardId={board.id} userId={user.id} />
           <ThemeToggle />
         </div>

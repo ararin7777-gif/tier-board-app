@@ -11,10 +11,14 @@ create table if not exists tier_boards (
   user_id uuid not null references auth.users(id) on delete cascade,
   title text not null default '無題のTier表',
   is_public boolean not null default false,
+  allow_public_edit boolean not null default false,
   share_slug text unique,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- 既存テーブルに対する追加(初回作成時は上のcreate tableで既にカラムが存在するため実質no-op)
+alter table tier_boards add column if not exists allow_public_edit boolean not null default false;
 
 -- Tier(段)
 create table if not exists tiers (
@@ -115,15 +119,24 @@ create policy "tiers_select" on tiers for select
       and (b.user_id = auth.uid() or b.is_public = true)
   ));
 
+-- 本人、または「公開かつ編集許可(allow_public_edit)」されたTier表はログインユーザーなら誰でも編集可
 drop policy if exists "tiers_write" on tiers;
 create policy "tiers_write" on tiers for all
   using (exists (
     select 1 from tier_boards b
-    where b.id = tiers.board_id and b.user_id = auth.uid()
+    where b.id = tiers.board_id
+      and (
+        b.user_id = auth.uid()
+        or (b.is_public = true and b.allow_public_edit = true and auth.uid() is not null)
+      )
   ))
   with check (exists (
     select 1 from tier_boards b
-    where b.id = tiers.board_id and b.user_id = auth.uid()
+    where b.id = tiers.board_id
+      and (
+        b.user_id = auth.uid()
+        or (b.is_public = true and b.allow_public_edit = true and auth.uid() is not null)
+      )
   ));
 
 -- --- items ---
@@ -139,11 +152,19 @@ drop policy if exists "items_write" on items;
 create policy "items_write" on items for all
   using (exists (
     select 1 from tier_boards b
-    where b.id = items.board_id and b.user_id = auth.uid()
+    where b.id = items.board_id
+      and (
+        b.user_id = auth.uid()
+        or (b.is_public = true and b.allow_public_edit = true and auth.uid() is not null)
+      )
   ))
   with check (exists (
     select 1 from tier_boards b
-    where b.id = items.board_id and b.user_id = auth.uid()
+    where b.id = items.board_id
+      and (
+        b.user_id = auth.uid()
+        or (b.is_public = true and b.allow_public_edit = true and auth.uid() is not null)
+      )
   ));
 
 -- =========================================

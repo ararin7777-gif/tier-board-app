@@ -27,7 +27,9 @@ export async function togglePublic(boardId: string, isPublic: boolean) {
   const { error } = await supabase
     .from("tier_boards")
     .update(
-      isPublic ? { is_public: true, share_slug: shareSlug } : { is_public: false },
+      isPublic
+        ? { is_public: true, share_slug: shareSlug }
+        : { is_public: false, allow_public_edit: false },
     )
     .eq("id", boardId);
 
@@ -40,6 +42,22 @@ export async function togglePublic(boardId: string, isPublic: boolean) {
   revalidatePath("/boards");
 
   return { shareSlug };
+}
+
+export async function toggleAllowPublicEdit(boardId: string, allow: boolean) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("tier_boards")
+    .update({ allow_public_edit: allow })
+    .eq("id", boardId);
+
+  if (error) {
+    console.error("toggleAllowPublicEdit: update failed", error);
+    throw new Error("編集許可設定の更新に失敗しました");
+  }
+
+  revalidatePath(`/boards/${boardId}`);
 }
 
 export async function addTier(boardId: string) {
