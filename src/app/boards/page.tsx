@@ -4,9 +4,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createBoard } from "./actions";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { DeleteBoardButton } from "@/components/delete-board-button";
 import { SignOutButton } from "@/components/sign-out-button";
+import { SubmitButton } from "@/components/submit-button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { createClient } from "@/lib/supabase/server";
 
@@ -79,10 +79,10 @@ export default async function BoardsPage() {
         </div>
         <div className="flex items-center gap-2">
           <form action={createBoard}>
-            <Button type="submit">
+            <SubmitButton pendingText="作成中…">
               <Plus className="size-4" />
               新規作成
-            </Button>
+            </SubmitButton>
           </form>
           <ThemeToggle />
           <SignOutButton />
@@ -93,9 +93,9 @@ export default async function BoardsPage() {
         <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border py-24 text-center">
           <p className="text-muted-foreground">まだTier表がありません</p>
           <form action={createBoard}>
-            <Button type="submit" variant="outline">
+            <SubmitButton pendingText="作成中…" variant="outline">
               最初のTier表を作成
-            </Button>
+            </SubmitButton>
           </form>
         </div>
       ) : (
