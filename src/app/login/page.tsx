@@ -27,11 +27,10 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 function linkErrorMessage(errorCode: string | null): string | null {
-  if (!errorCode) return null;
   if (errorCode === "otp_expired") {
     return "確認リンクの有効期限が切れています。もう一度サインアップし直してください。";
   }
-  return "確認リンクを処理できませんでした。もう一度お試しください。";
+  return null;
 }
 
 function LoginForm() {

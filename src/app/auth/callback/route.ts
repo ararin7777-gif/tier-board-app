@@ -15,7 +15,8 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(
-    `${origin}/login?error=confirmation_failed`,
-  );
+  // コード交換に失敗しても、メールソフトの安全確認機能等が先にリンクを
+  // 開いてしまい確認自体は完了しているケースが多いため、エラー表示はせず
+  // 通常のログイン画面へ案内する(アカウントは既に確認済みでログイン可能)
+  return NextResponse.redirect(`${origin}/login`);
 }
