@@ -128,7 +128,7 @@ export default async function BoardsPage() {
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center justify-between gap-2 pr-8">
+                  <div className="flex items-center justify-between gap-2">
                     <h2 className="font-medium">{board.title}</h2>
                     <div className="flex shrink-0 items-center gap-1">
                       <Badge variant={board.is_public ? "default" : "secondary"}>
