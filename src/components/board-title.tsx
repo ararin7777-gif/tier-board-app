@@ -54,7 +54,7 @@ export function BoardTitle({
         }}
         autoFocus
         disabled={isPending}
-        className="h-auto max-w-xl py-1 text-4xl font-semibold"
+        className="h-auto max-w-xl py-1 text-2xl sm:text-4xl font-semibold"
       />
     );
   }
@@ -63,10 +63,10 @@ export function BoardTitle({
     <button
       type="button"
       onClick={() => setIsEditing(true)}
-      className="group flex items-center gap-2 text-4xl font-semibold"
+      className="group flex items-center gap-2 text-2xl sm:text-4xl font-semibold"
     >
       {title}
-      <Pencil className="size-6 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+      <Pencil className="size-5 text-muted-foreground sm:size-6 opacity-0 transition-opacity group-hover:opacity-100" />
     </button>
   );
 }

@@ -47,7 +47,7 @@ export default async function SharedBoardPage({
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-6 sm:py-10">
       <div>
         <Link
           href="/boards"
@@ -59,7 +59,7 @@ export default async function SharedBoardPage({
       </div>
 
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-4xl font-semibold">{board.title}</h1>
+        <h1 className="text-2xl font-semibold sm:text-4xl">{board.title}</h1>
         <p className="text-sm text-muted-foreground">
           作成日: {formatDate(board.created_at)} | 更新日:{" "}
           {formatDate(board.updated_at)}
@@ -70,16 +70,16 @@ export default async function SharedBoardPage({
         {tiers?.map((tier) => (
           <div
             key={tier.id}
-            className="flex min-h-24 gap-3 rounded-lg border border-border p-3"
+            className="flex min-h-16 gap-2 rounded-lg border border-border p-2 sm:min-h-24 sm:gap-3 sm:p-3"
           >
             <span
               title={tier.label}
-              className="flex min-h-24 w-20 shrink-0 items-center justify-center self-stretch truncate rounded-lg px-2 text-sm font-semibold whitespace-nowrap text-white"
+              className="flex min-h-16 w-14 shrink-0 items-center justify-center self-stretch truncate rounded-lg px-2 text-sm font-semibold whitespace-nowrap text-white sm:min-h-24 sm:w-20"
               style={{ backgroundColor: tier.color }}
             >
               {tier.label}
             </span>
-            <div className="flex flex-1 flex-wrap content-center items-center gap-2">
+            <div className="flex flex-1 flex-wrap content-center items-center gap-1.5 sm:gap-2">
               {itemsByTier.get(tier.id)?.map((item) => (
                 <div
                   key={item.id}
@@ -92,14 +92,14 @@ export default async function SharedBoardPage({
                       src={item.image_url}
                       alt={item.name}
                       loading="lazy"
-                      className="max-h-24 max-w-32 rounded-lg bg-secondary ring-1 ring-border"
+                      className="max-h-16 max-w-20 rounded-lg bg-secondary ring-1 ring-border sm:max-h-24 sm:max-w-32"
                     />
                   ) : (
-                    <div className="flex size-24 items-center justify-center rounded-lg bg-secondary text-lg font-semibold text-muted-foreground ring-1 ring-border">
+                    <div className="flex size-16 items-center justify-center rounded-lg bg-secondary text-base font-semibold text-muted-foreground ring-1 ring-border sm:size-24 sm:text-lg">
                       {item.name.slice(0, 1) || "?"}
                     </div>
                   )}
-                  <span className="max-w-32 truncate text-center text-xs text-muted-foreground">
+                  <span className="max-w-20 truncate text-center text-xs text-muted-foreground sm:max-w-32">
                     {item.name}
                   </span>
                 </div>

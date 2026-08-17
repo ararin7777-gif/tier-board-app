@@ -59,7 +59,7 @@ function DroppableContainer({
   return (
     <div
       ref={setNodeRef}
-      className={`flex min-h-24 flex-1 flex-wrap items-center gap-2 rounded-lg transition-colors ${
+      className={`flex min-h-16 flex-1 flex-wrap items-center gap-1.5 rounded-lg transition-colors sm:min-h-24 sm:gap-2 ${
         isOver ? "bg-accent/10" : ""
       }`}
     >

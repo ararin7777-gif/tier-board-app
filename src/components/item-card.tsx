@@ -38,10 +38,10 @@ export function ItemCard({
             alt={item.name}
             loading="lazy"
             onError={() => setImageFailed(true)}
-            className="max-h-24 max-w-32 rounded-lg bg-secondary ring-1 ring-border"
+            className="max-h-16 max-w-20 rounded-lg bg-secondary ring-1 ring-border sm:max-h-24 sm:max-w-32"
           />
         ) : (
-          <div className="flex size-24 items-center justify-center rounded-lg bg-secondary text-lg font-semibold text-muted-foreground ring-1 ring-border">
+          <div className="flex size-16 items-center justify-center rounded-lg bg-secondary text-base font-semibold text-muted-foreground ring-1 ring-border sm:size-24 sm:text-lg">
             {item.name.slice(0, 1) || "?"}
           </div>
         )}
@@ -54,7 +54,7 @@ export function ItemCard({
           <X className="size-3" />
         </button>
       </div>
-      <span className="max-w-32 truncate text-center text-xs text-muted-foreground">
+      <span className="max-w-20 truncate text-center text-xs text-muted-foreground sm:max-w-32">
         {item.name}
       </span>
     </div>

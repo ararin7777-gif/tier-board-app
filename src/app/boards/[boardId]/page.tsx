@@ -68,7 +68,7 @@ export default async function BoardEditorPage({
   ]);
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-6 sm:py-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <Link
           href="/boards"
@@ -102,7 +102,7 @@ export default async function BoardEditorPage({
           <BoardTitle boardId={board.id} initialTitle={board.title} />
         ) : (
           <div className="flex items-center gap-2">
-            <h1 className="text-4xl font-semibold">{board.title}</h1>
+            <h1 className="text-2xl font-semibold sm:text-4xl">{board.title}</h1>
             <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
               他のユーザーの公開Tier表(編集可)
             </span>

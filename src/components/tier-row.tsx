@@ -97,11 +97,11 @@ export function TierRow({
   };
 
   return (
-    <div className="flex min-h-24 gap-3 rounded-lg border border-border p-3">
+    <div className="flex min-h-16 gap-2 rounded-lg border border-border p-2 sm:min-h-24 sm:gap-3 sm:p-3">
       {isEditing ? (
         <div
           onBlur={handleGroupBlur}
-          className="relative min-h-24 w-20 shrink-0 self-stretch overflow-hidden rounded-lg ring-1 ring-border"
+          className="relative min-h-16 w-14 shrink-0 self-stretch overflow-hidden rounded-lg ring-1 ring-border sm:min-h-24 sm:w-20"
         >
           <Input
             value={label}
@@ -110,7 +110,7 @@ export function TierRow({
             autoFocus
             disabled={isPending}
             style={{ backgroundColor: color }}
-            className="h-full w-full rounded-none border-0 text-center text-lg font-bold text-white placeholder:text-white/70 focus-visible:ring-0"
+            className="h-full w-full rounded-none border-0 text-center text-base font-bold text-white placeholder:text-white/70 focus-visible:ring-0 sm:text-lg"
           />
           <label className="absolute bottom-1 right-1 size-5 cursor-pointer rounded ring-1 ring-white/70">
             <span
@@ -130,14 +130,14 @@ export function TierRow({
         <button
           type="button"
           onClick={() => setIsEditing(true)}
-          className="flex min-h-24 w-20 shrink-0 self-stretch items-center justify-center rounded-lg text-lg font-bold text-white shadow-sm transition hover:brightness-95"
+          className="flex min-h-16 w-14 shrink-0 self-stretch items-center justify-center rounded-lg text-base font-bold text-white shadow-sm transition hover:brightness-95 sm:min-h-24 sm:w-20 sm:text-lg"
           style={{ backgroundColor: color }}
         >
           {label}
         </button>
       )}
 
-      <div className="flex min-h-24 flex-1 flex-wrap content-center items-center gap-2">
+      <div className="flex min-h-16 flex-1 flex-wrap content-center items-center gap-1.5 sm:min-h-24 sm:gap-2">
         {children ?? (
           <span className="text-sm text-muted-foreground">
             アイテムはまだありません
@@ -145,12 +145,12 @@ export function TierRow({
         )}
       </div>
 
-      <div className="flex shrink-0 items-center gap-1 self-center">
+      <div className="flex shrink-0 items-center gap-0.5 self-center sm:gap-1">
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="size-8"
+          className="size-7 sm:size-8"
           disabled={isFirst || isPending}
           onClick={() => handleMove("up")}
         >
@@ -161,7 +161,7 @@ export function TierRow({
           type="button"
           variant="ghost"
           size="icon"
-          className="size-8"
+          className="size-7 sm:size-8"
           disabled={isLast || isPending}
           onClick={() => handleMove("down")}
         >
@@ -175,7 +175,7 @@ export function TierRow({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="size-8 text-muted-foreground hover:text-destructive"
+                className="size-7 text-muted-foreground hover:text-destructive sm:size-8"
               />
             }
           >
