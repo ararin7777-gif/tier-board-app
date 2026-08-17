@@ -1,7 +1,6 @@
 "use client";
 
 import { X } from "lucide-react";
-import Image from "next/image";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { deleteItem } from "@/app/boards/[boardId]/actions";
@@ -29,20 +28,20 @@ export function ItemCard({
   return (
     <div
       title={item.name}
-      className="group relative flex w-16 flex-col items-center gap-1"
+      className="group relative flex flex-col items-center gap-1"
     >
-      <div className="relative size-16 overflow-hidden rounded-lg bg-secondary ring-1 ring-border">
+      <div className="relative">
         {item.image_url && !imageFailed ? (
-          <Image
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={item.image_url}
             alt={item.name}
-            fill
-            sizes="64px"
-            className="object-cover"
+            loading="lazy"
             onError={() => setImageFailed(true)}
+            className="max-h-24 max-w-32 rounded-lg bg-secondary ring-1 ring-border"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-lg font-semibold text-muted-foreground">
+          <div className="flex size-24 items-center justify-center rounded-lg bg-secondary text-lg font-semibold text-muted-foreground ring-1 ring-border">
             {item.name.slice(0, 1) || "?"}
           </div>
         )}
@@ -55,7 +54,7 @@ export function ItemCard({
           <X className="size-3" />
         </button>
       </div>
-      <span className="w-full truncate text-center text-xs text-muted-foreground">
+      <span className="max-w-32 truncate text-center text-xs text-muted-foreground">
         {item.name}
       </span>
     </div>

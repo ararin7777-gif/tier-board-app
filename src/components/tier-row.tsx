@@ -110,7 +110,7 @@ export function TierRow({
         className="h-9 w-24 shrink-0 font-medium"
       />
 
-      <div className="flex min-h-9 flex-1 flex-wrap items-center gap-2">
+      <div className="flex min-h-24 flex-1 flex-wrap items-center gap-2">
         {children ?? (
           <span className="text-sm text-muted-foreground">
             アイテムはまだありません
