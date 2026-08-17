@@ -3,13 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-// 全角文字(日本語など)は半角文字の約2倍の幅として概算する
-function labelWidthUnits(label: string): number {
-  let units = 0;
-  for (const ch of label) {
-    units += /[^\x01-\x7E\xA1-\xDF]/.test(ch) ? 2 : 1;
-  }
-  return units;
+function formatDate(value: string) {
+  return new Date(value).toLocaleDateString("ja-JP");
 }
 
 export default async function SharedBoardPage({
@@ -20,7 +15,7 @@ export default async function SharedBoardPage({
 
   const { data: board } = await supabase
     .from("tier_boards")
-    .select("id, title")
+    .select("id, title, created_at, updated_at")
     .eq("share_slug", slug)
     .eq("is_public", true)
     .single();
@@ -51,12 +46,6 @@ export default async function SharedBoardPage({
     itemsByTier.set(item.tier_id, list);
   }
 
-  const maxLabelUnits = Math.max(
-    2,
-    ...(tiers ?? []).map((t) => labelWidthUnits(t.label)),
-  );
-  const chipWidth = Math.max(64, maxLabelUnits * 10 + 24);
-
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10">
       <div>
@@ -69,25 +58,28 @@ export default async function SharedBoardPage({
         </Link>
       </div>
 
-      <header>
-        <h1 className="text-xl font-semibold">{board.title}</h1>
-        <p className="text-sm text-muted-foreground">閲覧専用の共有ビュー</p>
-      </header>
+      <div className="flex flex-col items-center gap-2 text-center">
+        <h1 className="text-4xl font-semibold">{board.title}</h1>
+        <p className="text-sm text-muted-foreground">
+          作成日: {formatDate(board.created_at)} | 更新日:{" "}
+          {formatDate(board.updated_at)}
+        </p>
+      </div>
 
       <div className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-4 shadow-sm">
         {tiers?.map((tier) => (
           <div
             key={tier.id}
-            className="flex min-h-24 items-center gap-3 rounded-lg border border-border p-3"
+            className="flex min-h-24 gap-3 rounded-lg border border-border p-3"
           >
             <span
               title={tier.label}
-              className="flex h-10 shrink-0 items-center justify-center truncate rounded-lg px-2 text-sm font-semibold whitespace-nowrap text-white"
-              style={{ backgroundColor: tier.color, width: `${chipWidth}px` }}
+              className="flex min-h-24 w-20 shrink-0 items-center justify-center self-stretch truncate rounded-lg px-2 text-sm font-semibold whitespace-nowrap text-white"
+              style={{ backgroundColor: tier.color }}
             >
               {tier.label}
             </span>
-            <div className="flex flex-1 flex-wrap items-center gap-2">
+            <div className="flex flex-1 flex-wrap content-center items-center gap-2">
               {itemsByTier.get(tier.id)?.map((item) => (
                 <div
                   key={item.id}
