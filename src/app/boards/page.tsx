@@ -5,10 +5,16 @@ import { redirect } from "next/navigation";
 import { createBoard } from "./actions";
 import { Badge } from "@/components/ui/badge";
 import { DeleteBoardButton } from "@/components/delete-board-button";
+import { ImportBoardDialog } from "@/components/import-board-dialog";
 import { SignOutButton } from "@/components/sign-out-button";
 import { SubmitButton } from "@/components/submit-button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { createClient } from "@/lib/supabase/server";
+
+// インポート機能(外部Tier表の画像を多数ダウンロード・アップロードする)が
+// Vercelのデフォルト実行時間制限に収まるよう、このページ配下のServer Actionの
+// 最大実行時間を延長する
+export const maxDuration = 60;
 
 export default async function BoardsPage() {
   const supabase = await createClient();
@@ -84,6 +90,7 @@ export default async function BoardsPage() {
               新規作成
             </SubmitButton>
           </form>
+          <ImportBoardDialog />
           <ThemeToggle />
           <SignOutButton />
         </div>
