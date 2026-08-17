@@ -23,6 +23,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { moveItems } from "@/app/boards/[boardId]/actions";
+import { AddTierButton } from "@/components/add-tier-button";
 import { ItemCard } from "@/components/item-card";
 import { TierRow } from "@/components/tier-row";
 
@@ -248,6 +249,8 @@ export function BoardEditor({
           );
         })}
       </div>
+
+      <AddTierButton boardId={boardId} />
 
       <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-border p-4">
         <h2 className="text-sm font-medium text-muted-foreground">

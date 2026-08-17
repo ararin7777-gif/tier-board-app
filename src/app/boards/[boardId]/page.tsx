@@ -2,7 +2,6 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AddItemsDialog } from "@/components/add-items-dialog";
-import { AddTierButton } from "@/components/add-tier-button";
 import { BoardEditor } from "@/components/board-editor";
 import { BoardTitle } from "@/components/board-title";
 import { CoverImageControl } from "@/components/cover-image-control";
@@ -117,14 +116,11 @@ export default async function BoardEditorPage({
 
       <BoardEditor boardId={board.id} tiers={tiers ?? []} items={items ?? []} />
 
-      <div className="flex flex-col gap-3">
-        <AddItemsDialog
-          boardId={board.id}
-          userId={user.id}
-          triggerClassName="h-14 w-full text-base"
-        />
-        <AddTierButton boardId={board.id} />
-      </div>
+      <AddItemsDialog
+        boardId={board.id}
+        userId={user.id}
+        triggerClassName="h-14 w-full text-base"
+      />
     </div>
   );
 }
