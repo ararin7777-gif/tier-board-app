@@ -35,14 +35,17 @@ export function TierRow({
 }) {
   const [label, setLabel] = useState(tier.label);
   const [color, setColor] = useState(tier.color);
+  const [isEditing, setIsEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const saveLabel = () => {
-    const trimmed = label.trim();
-    if (!trimmed || trimmed === tier.label) {
+    const trimmed = label.trim().slice(0, 3);
+    if (!trimmed) {
       setLabel(tier.label);
       return;
     }
+    setLabel(trimmed);
+    if (trimmed === tier.label) return;
     startTransition(async () => {
       try {
         await updateTier(boardId, tier.id, { label: trimmed });
@@ -51,6 +54,13 @@ export function TierRow({
         setLabel(tier.label);
       }
     });
+  };
+
+  const handleGroupBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      setIsEditing(false);
+      saveLabel();
+    }
   };
 
   const saveColor = (value: string) => {
@@ -88,27 +98,44 @@ export function TierRow({
 
   return (
     <div className="flex min-h-16 items-center gap-3 rounded-lg border border-border p-3">
-      <label className="relative shrink-0">
-        <span
-          className="block size-10 cursor-pointer rounded-lg ring-1 ring-border"
+      {isEditing ? (
+        <div
+          onBlur={handleGroupBlur}
+          className="relative h-24 w-20 shrink-0 overflow-hidden rounded-lg ring-1 ring-border"
+        >
+          <Input
+            value={label}
+            onChange={(e) => setLabel(e.target.value.slice(0, 3))}
+            maxLength={3}
+            autoFocus
+            disabled={isPending}
+            style={{ backgroundColor: color }}
+            className="h-full w-full rounded-none border-0 text-center text-lg font-bold text-white placeholder:text-white/70 focus-visible:ring-0"
+          />
+          <label className="absolute bottom-1 right-1 size-5 cursor-pointer rounded ring-1 ring-white/70">
+            <span
+              className="block size-full rounded"
+              style={{ backgroundColor: color }}
+            />
+            <input
+              type="color"
+              value={color}
+              onChange={(e) => saveColor(e.target.value)}
+              className="absolute inset-0 size-full cursor-pointer opacity-0"
+              aria-label="段の色"
+            />
+          </label>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setIsEditing(true)}
+          className="flex h-24 w-20 shrink-0 items-center justify-center rounded-lg text-lg font-bold text-white shadow-sm transition hover:brightness-95"
           style={{ backgroundColor: color }}
-        />
-        <input
-          type="color"
-          value={color}
-          onChange={(e) => saveColor(e.target.value)}
-          className="absolute inset-0 size-10 cursor-pointer opacity-0"
-          aria-label="段の色"
-        />
-      </label>
-
-      <Input
-        value={label}
-        onChange={(e) => setLabel(e.target.value)}
-        onBlur={saveLabel}
-        disabled={isPending}
-        className="h-9 w-24 shrink-0 font-medium"
-      />
+        >
+          {label}
+        </button>
+      )}
 
       <div className="flex min-h-24 flex-1 flex-wrap items-center gap-2">
         {children ?? (
