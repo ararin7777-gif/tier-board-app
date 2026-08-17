@@ -98,7 +98,7 @@ export default async function BoardEditorPage({
         </div>
       </div>
 
-      <div className="flex flex-col items-center gap-1 text-center">
+      <div className="flex flex-col items-center gap-2 text-center">
         {isOwner ? (
           <BoardTitle boardId={board.id} initialTitle={board.title} />
         ) : (

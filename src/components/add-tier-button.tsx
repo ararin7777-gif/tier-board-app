@@ -25,7 +25,7 @@ export function AddTierButton({ boardId }: { boardId: string }) {
       variant="outline"
       onClick={handleClick}
       disabled={isPending}
-      className="self-start"
+      className="h-11 w-full gap-2 border-2 border-dashed border-border bg-transparent text-sm font-medium text-muted-foreground hover:border-accent hover:bg-accent/5 hover:text-accent"
     >
       <Plus className="size-4" />
       段を追加

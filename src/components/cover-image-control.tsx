@@ -80,20 +80,20 @@ export function CoverImageControl({
   const showImage = coverImageUrl && !imageFailed;
 
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5">
-      <div className="relative size-9 shrink-0 overflow-hidden rounded-md bg-secondary">
+    <div className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5">
+      <div className="relative size-5 shrink-0 overflow-hidden rounded-sm bg-secondary">
         {showImage ? (
           <Image
             src={coverImageUrl}
             alt="タイトル画面"
             fill
-            sizes="36px"
+            sizes="20px"
             className="object-cover"
             onError={() => setImageFailed(true)}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <ImagePlus className="size-4 text-muted-foreground" />
+            <ImagePlus className="size-3 text-muted-foreground" />
           </div>
         )}
       </div>
@@ -105,7 +105,7 @@ export function CoverImageControl({
           type="button"
           variant="outline"
           size="sm"
-          className="h-7 px-2 text-xs"
+          className="h-6 px-2 text-xs"
           disabled={isUploading}
           onClick={() => inputRef.current?.click()}
         >
@@ -128,7 +128,7 @@ export function CoverImageControl({
           type="button"
           variant="ghost"
           size="icon"
-          className="size-7"
+          className="size-6"
           disabled={isPending}
           onClick={handleReset}
         >
