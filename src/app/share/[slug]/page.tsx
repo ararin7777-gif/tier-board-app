@@ -1,4 +1,6 @@
+import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -58,6 +60,16 @@ export default async function SharedBoardPage({
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10">
+      <div>
+        <Link
+          href="/boards"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" />
+          Tier表一覧に戻る
+        </Link>
+      </div>
+
       <header>
         <h1 className="text-xl font-semibold">{board.title}</h1>
         <p className="text-sm text-muted-foreground">閲覧専用の共有ビュー</p>
