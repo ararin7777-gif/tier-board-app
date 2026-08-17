@@ -30,9 +30,11 @@ const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 export function AddItemsDialog({
   boardId,
   userId,
+  triggerClassName,
 }: {
   boardId: string;
   userId: string;
+  triggerClassName?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [pendingItems, setPendingItems] = useState<PendingItem[]>([]);
@@ -134,7 +136,7 @@ export function AddItemsDialog({
         if (!next) setPendingItems([]);
       }}
     >
-      <DialogTrigger render={<Button type="button" />}>
+      <DialogTrigger render={<Button type="button" className={triggerClassName} />}>
         <ImagePlus className="size-4" />
         アイテムを追加
       </DialogTrigger>

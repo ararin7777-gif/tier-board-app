@@ -10,6 +10,10 @@ import { PublicToggle } from "@/components/public-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { createClient } from "@/lib/supabase/server";
 
+function formatDate(value: string) {
+  return new Date(value).toLocaleDateString("ja-JP");
+}
+
 export default async function BoardEditorPage({
   params,
 }: PageProps<"/boards/[boardId]">) {
@@ -28,7 +32,7 @@ export default async function BoardEditorPage({
   const { data: board } = await supabase
     .from("tier_boards")
     .select(
-      "id, title, is_public, share_slug, allow_public_edit, cover_image_url, user_id",
+      "id, title, is_public, share_slug, allow_public_edit, cover_image_url, created_at, updated_at, user_id",
     )
     .eq("id", boardId)
     .single();
@@ -66,7 +70,7 @@ export default async function BoardEditorPage({
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10">
-      <div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <Link
           href="/boards"
           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -74,45 +78,53 @@ export default async function BoardEditorPage({
           <ArrowLeft className="size-4" />
           Tier表一覧に戻る
         </Link>
-      </div>
-
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2">
-          {isOwner ? (
-            <BoardTitle boardId={board.id} initialTitle={board.title} />
-          ) : (
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-semibold">{board.title}</h1>
-              <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
-                他のユーザーの公開Tier表(編集可)
-              </span>
-            </div>
-          )}
-          {isOwner && (
-            <CoverImageControl
-              boardId={board.id}
-              userId={user.id}
-              initialCoverImageUrl={board.cover_image_url}
-            />
-          )}
-        </div>
         <div className="flex flex-wrap items-center gap-2">
           {isOwner && (
-            <PublicToggle
-              boardId={board.id}
-              initialIsPublic={board.is_public}
-              initialShareSlug={board.share_slug}
-              initialAllowPublicEdit={board.allow_public_edit}
-            />
+            <>
+              <CoverImageControl
+                boardId={board.id}
+                userId={user.id}
+                initialCoverImageUrl={board.cover_image_url}
+              />
+              <PublicToggle
+                boardId={board.id}
+                initialIsPublic={board.is_public}
+                initialShareSlug={board.share_slug}
+                initialAllowPublicEdit={board.allow_public_edit}
+              />
+            </>
           )}
-          <AddItemsDialog boardId={board.id} userId={user.id} />
           <ThemeToggle />
         </div>
-      </header>
+      </div>
+
+      <div className="flex flex-col items-center gap-1 text-center">
+        {isOwner ? (
+          <BoardTitle boardId={board.id} initialTitle={board.title} />
+        ) : (
+          <div className="flex items-center gap-2">
+            <h1 className="text-4xl font-semibold">{board.title}</h1>
+            <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
+              他のユーザーの公開Tier表(編集可)
+            </span>
+          </div>
+        )}
+        <p className="text-sm text-muted-foreground">
+          作成日: {formatDate(board.created_at)} | 更新日:{" "}
+          {formatDate(board.updated_at)}
+        </p>
+      </div>
 
       <BoardEditor boardId={board.id} tiers={tiers ?? []} items={items ?? []} />
 
-      <AddTierButton boardId={board.id} />
+      <div className="flex flex-col gap-3">
+        <AddItemsDialog
+          boardId={board.id}
+          userId={user.id}
+          triggerClassName="h-14 w-full text-base"
+        />
+        <AddTierButton boardId={board.id} />
+      </div>
     </div>
   );
 }
