@@ -20,9 +20,10 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Trash2 } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { moveItems } from "@/app/boards/[boardId]/actions";
+import { deleteItem, moveItems } from "@/app/boards/[boardId]/actions";
 import { AddTierButton } from "@/components/add-tier-button";
 import { ItemCard } from "@/components/item-card";
 import { TierRow } from "@/components/tier-row";
@@ -43,9 +44,29 @@ type TierData = {
 };
 
 const POOL_ID = "pool";
+const TRASH_ID = "trash";
 
 function containerIdOf(item: ItemRow) {
   return item.tier_id ?? POOL_ID;
+}
+
+function TrashDropZone({ visible }: { visible: boolean }) {
+  const { setNodeRef, isOver } = useDroppable({ id: TRASH_ID });
+  return (
+    <div
+      ref={setNodeRef}
+      className={`fixed inset-x-0 bottom-6 z-50 mx-auto flex w-fit items-center gap-2 rounded-full border-2 px-6 py-3 shadow-lg transition-all ${
+        visible ? "opacity-100" : "pointer-events-none opacity-0"
+      } ${
+        isOver
+          ? "scale-110 border-destructive bg-destructive text-destructive-foreground"
+          : "border-destructive/40 bg-card text-destructive"
+      }`}
+    >
+      <Trash2 className="size-5" />
+      <span className="text-sm font-medium">ここにドロップして削除</span>
+    </div>
+  );
 }
 
 function DroppableContainer({
@@ -154,6 +175,23 @@ export function BoardEditor({
 
     const activeItemId = String(active.id);
     const overId = String(over.id);
+
+    if (overId === TRASH_ID) {
+      const target = items.find((i) => i.id === activeItemId);
+      if (!target) return;
+      setItems((prev) => prev.filter((i) => i.id !== activeItemId));
+      startTransition(async () => {
+        try {
+          await deleteItem(boardId, target.id, target.image_url);
+          toast.success("アイテムを削除しました");
+        } catch {
+          toast.error("削除に失敗しました");
+          setItems((prev) => [...prev, target]);
+        }
+      });
+      return;
+    }
+
     const sourceContainer = resolveContainerId(activeItemId);
     const destContainer = resolveContainerId(overId);
 
@@ -277,6 +315,8 @@ export function BoardEditor({
       <DragOverlay>
         {activeItem ? <ItemCard boardId={boardId} item={activeItem} /> : null}
       </DragOverlay>
+
+      <TrashDropZone visible={activeId !== null} />
     </DndContext>
   );
 }
