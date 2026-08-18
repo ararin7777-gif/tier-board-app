@@ -225,38 +225,22 @@ export async function moveItems(
   revalidatePath(`/boards/${boardId}`);
 }
 
-export async function moveTier(
-  boardId: string,
-  tierId: string,
-  direction: "up" | "down",
-) {
+export async function reorderTiers(boardId: string, orderedTierIds: string[]) {
+  if (orderedTierIds.length === 0) return;
   const supabase = await createClient();
 
-  const { data: tiers, error: fetchError } = await supabase
-    .from("tiers")
-    .select("id, position")
-    .eq("board_id", boardId)
-    .order("position", { ascending: true });
+  const results = await Promise.all(
+    orderedTierIds.map((id, index) =>
+      supabase
+        .from("tiers")
+        .update({ position: index * 10 })
+        .eq("id", id),
+    ),
+  );
 
-  if (fetchError || !tiers) {
-    console.error("moveTier: failed to fetch tiers", fetchError);
-    throw new Error("段の並べ替えに失敗しました");
-  }
-
-  const index = tiers.findIndex((t) => t.id === tierId);
-  const swapIndex = direction === "up" ? index - 1 : index + 1;
-  if (index === -1 || swapIndex < 0 || swapIndex >= tiers.length) return;
-
-  const current = tiers[index];
-  const target = tiers[swapIndex];
-
-  const [{ error: error1 }, { error: error2 }] = await Promise.all([
-    supabase.from("tiers").update({ position: target.position }).eq("id", current.id),
-    supabase.from("tiers").update({ position: current.position }).eq("id", target.id),
-  ]);
-
-  if (error1 || error2) {
-    console.error("moveTier: swap failed", error1, error2);
+  const failed = results.find((r) => r.error);
+  if (failed?.error) {
+    console.error("reorderTiers failed", failed.error);
     throw new Error("段の並べ替えに失敗しました");
   }
 

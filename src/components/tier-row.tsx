@@ -1,36 +1,19 @@
 "use client";
 
-import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { deleteTier, moveTier, updateTier } from "@/app/boards/[boardId]/actions";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { updateTier } from "@/app/boards/[boardId]/actions";
 import { Input } from "@/components/ui/input";
 
 export function TierRow({
   boardId,
   tier,
-  isFirst,
-  isLast,
-  itemCount,
+  dragHandleProps,
   children,
 }: {
   boardId: string;
   tier: { id: string; label: string; color: string };
-  isFirst: boolean;
-  isLast: boolean;
-  itemCount: number;
+  dragHandleProps?: React.HTMLAttributes<HTMLButtonElement>;
   children?: React.ReactNode;
 }) {
   const [label, setLabel] = useState(tier.label);
@@ -75,27 +58,6 @@ export function TierRow({
     });
   };
 
-  const handleMove = (direction: "up" | "down") => {
-    startTransition(async () => {
-      try {
-        await moveTier(boardId, tier.id, direction);
-      } catch {
-        toast.error("並べ替えに失敗しました");
-      }
-    });
-  };
-
-  const handleDelete = () => {
-    startTransition(async () => {
-      try {
-        await deleteTier(boardId, tier.id);
-        toast.success("段を削除しました");
-      } catch {
-        toast.error("段の削除に失敗しました");
-      }
-    });
-  };
-
   return (
     <div className="flex min-h-16 gap-2 rounded-lg border border-border p-2 sm:min-h-24 sm:gap-3 sm:p-3">
       {isEditing ? (
@@ -130,8 +92,9 @@ export function TierRow({
         <button
           type="button"
           onClick={() => setIsEditing(true)}
-          className="flex min-h-16 w-14 shrink-0 self-stretch items-center justify-center rounded-lg text-base font-bold text-white shadow-sm transition hover:brightness-95 sm:min-h-24 sm:w-20 sm:text-lg"
+          className="flex min-h-16 w-14 shrink-0 touch-none self-stretch items-center justify-center rounded-lg text-base font-bold text-white shadow-sm transition hover:brightness-95 active:cursor-grabbing sm:min-h-24 sm:w-20 sm:text-lg"
           style={{ backgroundColor: color }}
+          {...dragHandleProps}
         >
           {label}
         </button>
@@ -143,65 +106,6 @@ export function TierRow({
             アイテムはまだありません
           </span>
         )}
-      </div>
-
-      <div className="flex shrink-0 items-center gap-0.5 self-center sm:gap-1">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="size-7 sm:size-8"
-          disabled={isFirst || isPending}
-          onClick={() => handleMove("up")}
-        >
-          <ChevronUp className="size-4" />
-          <span className="sr-only">上へ</span>
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="size-7 sm:size-8"
-          disabled={isLast || isPending}
-          onClick={() => handleMove("down")}
-        >
-          <ChevronDown className="size-4" />
-          <span className="sr-only">下へ</span>
-        </Button>
-        <AlertDialog>
-          <AlertDialogTrigger
-            render={
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="size-7 text-muted-foreground hover:text-destructive sm:size-8"
-              />
-            }
-          >
-            <Trash2 className="size-4" />
-            <span className="sr-only">段を削除</span>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>「{tier.label}」を削除しますか?</AlertDialogTitle>
-              <AlertDialogDescription>
-                {itemCount > 0
-                  ? `この段にある${itemCount}件のアイテムは、未評価のプールに戻ります。`
-                  : "この操作は取り消せません。"}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>キャンセル</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDelete}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
-                削除する
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
     </div>
   );

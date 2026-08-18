@@ -18,13 +18,19 @@ import {
   rectSortingStrategy,
   sortableKeyboardCoordinates,
   useSortable,
+  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Trash2 } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { deleteItem, moveItems } from "@/app/boards/[boardId]/actions";
+import {
+  deleteItem,
+  moveItems,
+  reorderTiers,
+} from "@/app/boards/[boardId]/actions";
 import { AddTierButton } from "@/components/add-tier-button";
+import { DeleteTierDialog } from "@/components/delete-tier-dialog";
 import { ItemCard } from "@/components/item-card";
 import { TierRow } from "@/components/tier-row";
 
@@ -45,6 +51,12 @@ type TierData = {
 
 const POOL_ID = "pool";
 const TRASH_ID = "trash";
+
+// 段の「行」を並べ替えるドラッグ操作は、段の中のアイテム(useDroppable)と
+// idが衝突しないよう、専用のプレフィックスを付けたidを使う
+const tierRowId = (tierId: string) => `row-${tierId}`;
+const isTierRowId = (id: string) => id.startsWith("row-");
+const tierIdFromRowId = (id: string) => id.slice(4);
 
 function containerIdOf(item: ItemRow) {
   return item.tier_id ?? POOL_ID;
@@ -116,9 +128,41 @@ function SortableItem({ boardId, item }: { boardId: string; item: ItemRow }) {
   );
 }
 
+function SortableTierRow({
+  boardId,
+  tier,
+  children,
+}: {
+  boardId: string;
+  tier: TierData;
+  children: React.ReactNode;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: tierRowId(tier.id) });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Translate.toString(transform),
+        transition: transition ?? undefined,
+        opacity: isDragging ? 0.5 : 1,
+      }}
+    >
+      <TierRow
+        boardId={boardId}
+        tier={tier}
+        dragHandleProps={{ ...attributes, ...listeners }}
+      >
+        {children}
+      </TierRow>
+    </div>
+  );
+}
+
 export function BoardEditor({
   boardId,
-  tiers,
+  tiers: initialTiers,
   items: initialItems,
 }: {
   boardId: string;
@@ -126,12 +170,17 @@ export function BoardEditor({
   items: ItemRow[];
 }) {
   const [items, setItems] = useState(initialItems);
+  const [tiers, setTiers] = useState(initialTiers);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
   useEffect(() => {
     setItems(initialItems);
   }, [initialItems]);
+
+  useEffect(() => {
+    setTiers(initialTiers);
+  }, [initialTiers]);
 
   const tierIds = new Set(tiers.map((t) => t.id));
 
@@ -173,7 +222,34 @@ export function BoardEditor({
     const { active, over } = event;
     if (!over) return;
 
-    const activeItemId = String(active.id);
+    const activeIdStr = String(active.id);
+
+    // 段(Tier行)自体の並べ替え
+    if (isTierRowId(activeIdStr)) {
+      const overIdStr = String(over.id);
+      if (!isTierRowId(overIdStr) || overIdStr === activeIdStr) return;
+
+      const activeTierId = tierIdFromRowId(activeIdStr);
+      const overTierId = tierIdFromRowId(overIdStr);
+      const oldIndex = tiers.findIndex((t) => t.id === activeTierId);
+      const newIndex = tiers.findIndex((t) => t.id === overTierId);
+      if (oldIndex === -1 || newIndex === -1) return;
+
+      const reordered = arrayMove(tiers, oldIndex, newIndex).map(
+        (tier, index) => ({ ...tier, position: index * 10 }),
+      );
+      setTiers(reordered);
+      startTransition(async () => {
+        try {
+          await reorderTiers(boardId, reordered.map((t) => t.id));
+        } catch {
+          toast.error("段の並べ替えの保存に失敗しました");
+        }
+      });
+      return;
+    }
+
+    const activeItemId = activeIdStr;
     const overId = String(over.id);
 
     if (overId === TRASH_ID) {
@@ -246,7 +322,13 @@ export function BoardEditor({
     persist(allUpdated);
   };
 
-  const activeItem = items.find((i) => i.id === activeId);
+  const activeItem = !activeId || isTierRowId(activeId)
+    ? undefined
+    : items.find((i) => i.id === activeId);
+  const activeTier = activeId && isTierRowId(activeId)
+    ? tiers.find((t) => t.id === tierIdFromRowId(activeId))
+    : undefined;
+
   const poolItems = items
     .filter((i) => !i.tier_id)
     .sort((a, b) => a.position - b.position);
@@ -259,36 +341,43 @@ export function BoardEditor({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-4 shadow-sm">
-        {tiers.map((tier, index) => {
-          const tierItems = items
-            .filter((i) => i.tier_id === tier.id)
-            .sort((a, b) => a.position - b.position);
-          return (
-            <TierRow
-              key={tier.id}
-              boardId={boardId}
-              tier={tier}
-              isFirst={index === 0}
-              isLast={index === tiers.length - 1}
-              itemCount={tierItems.length}
-            >
-              <SortableContext
-                items={tierItems.map((i) => i.id)}
-                strategy={rectSortingStrategy}
-              >
-                <DroppableContainer id={tier.id}>
-                  {tierItems.map((item) => (
-                    <SortableItem key={item.id} boardId={boardId} item={item} />
-                  ))}
-                </DroppableContainer>
-              </SortableContext>
-            </TierRow>
-          );
-        })}
-      </div>
+      <SortableContext
+        items={tiers.map((t) => tierRowId(t.id))}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-4 shadow-sm">
+          {tiers.map((tier) => {
+            const tierItems = items
+              .filter((i) => i.tier_id === tier.id)
+              .sort((a, b) => a.position - b.position);
+            return (
+              <SortableTierRow key={tier.id} boardId={boardId} tier={tier}>
+                <SortableContext
+                  items={tierItems.map((i) => i.id)}
+                  strategy={rectSortingStrategy}
+                >
+                  <DroppableContainer id={tier.id}>
+                    {tierItems.map((item) => (
+                      <SortableItem key={item.id} boardId={boardId} item={item} />
+                    ))}
+                  </DroppableContainer>
+                </SortableContext>
+              </SortableTierRow>
+            );
+          })}
+        </div>
+      </SortableContext>
 
       <AddTierButton boardId={boardId} />
+      <DeleteTierDialog
+        boardId={boardId}
+        tiers={tiers.map((tier) => ({
+          id: tier.id,
+          label: tier.label,
+          color: tier.color,
+          itemCount: items.filter((i) => i.tier_id === tier.id).length,
+        }))}
+      />
 
       <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-border p-4">
         <h2 className="text-sm font-medium text-muted-foreground">
@@ -313,10 +402,19 @@ export function BoardEditor({
       </div>
 
       <DragOverlay>
-        {activeItem ? <ItemCard boardId={boardId} item={activeItem} /> : null}
+        {activeItem ? (
+          <ItemCard boardId={boardId} item={activeItem} />
+        ) : activeTier ? (
+          <div
+            className="flex h-16 w-14 items-center justify-center rounded-lg text-base font-bold text-white shadow-lg sm:h-24 sm:w-20 sm:text-lg"
+            style={{ backgroundColor: activeTier.color }}
+          >
+            {activeTier.label}
+          </div>
+        ) : null}
       </DragOverlay>
 
-      <TrashDropZone visible={activeId !== null} />
+      <TrashDropZone visible={!!activeId && !isTierRowId(activeId)} />
     </DndContext>
   );
 }
