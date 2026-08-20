@@ -92,7 +92,7 @@ export function TierRow({
         <button
           type="button"
           onClick={() => setIsEditing(true)}
-          className="flex min-h-16 w-14 shrink-0 touch-none self-stretch items-center justify-center rounded-lg text-base font-bold text-white shadow-sm transition hover:brightness-95 active:cursor-grabbing sm:min-h-24 sm:w-20 sm:text-lg"
+          className="flex min-h-16 w-14 shrink-0 touch-manipulation self-stretch items-center justify-center rounded-lg text-base font-bold text-white shadow-sm transition hover:brightness-95 active:cursor-grabbing sm:min-h-24 sm:w-20 sm:text-lg"
           style={{ backgroundColor: color }}
           {...dragHandleProps}
         >

@@ -4,7 +4,8 @@ import {
   DndContext,
   DragOverlay,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   rectIntersection,
   useDroppable,
   useSensor,
@@ -117,7 +118,7 @@ function SortableItem({ boardId, item }: { boardId: string; item: ItemRow }) {
         transform: CSS.Translate.toString(transform),
         transition: transition ?? undefined,
         opacity: isDragging ? 0.4 : 1,
-        touchAction: "none",
+        touchAction: "manipulation",
       }}
       {...attributes}
       {...listeners}
@@ -189,7 +190,13 @@ export function BoardEditor({
   };
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    // マウス: 8px動いたらすぐドラッグ開始(従来通りの快適さを維持)
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    // タッチ: 250ms長押ししてからドラッグ開始。それより早い指の動きは
+    // スクロール操作とみなし、ドラッグを発生させない
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
