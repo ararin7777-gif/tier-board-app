@@ -75,7 +75,7 @@ export async function addTier(boardId: string) {
 
   const { error } = await supabase.from("tiers").insert({
     board_id: boardId,
-    label: "新しい段",
+    label: "新規",
     color: "#a3a399",
     position: nextPosition,
   });
