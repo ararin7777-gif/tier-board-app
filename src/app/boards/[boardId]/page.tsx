@@ -62,7 +62,7 @@ export default async function BoardEditorPage({
       .order("position", { ascending: true }),
     supabase
       .from("items")
-      .select("id, tier_id, name, image_url, position")
+      .select("id, tier_id, image_url, position")
       .eq("board_id", board.id)
       .order("position", { ascending: true }),
   ]);

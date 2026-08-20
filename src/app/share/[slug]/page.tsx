@@ -32,7 +32,7 @@ export default async function SharedBoardPage({
       .order("position", { ascending: true }),
     supabase
       .from("items")
-      .select("id, tier_id, name, image_url, position")
+      .select("id, tier_id, image_url, position")
       .eq("board_id", board.id)
       .not("tier_id", "is", null)
       .order("position", { ascending: true }),
@@ -80,30 +80,25 @@ export default async function SharedBoardPage({
               {tier.label}
             </span>
             <div className="flex flex-1 flex-wrap content-center items-center gap-1.5 sm:gap-2">
-              {itemsByTier.get(tier.id)?.map((item) => (
-                <div
-                  key={item.id}
-                  title={item.name}
-                  className="flex flex-col items-center gap-1"
-                >
-                  {item.image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={item.image_url}
-                      alt={item.name}
-                      loading="lazy"
-                      className="max-h-16 max-w-20 rounded-lg bg-secondary ring-1 ring-border sm:max-h-24 sm:max-w-32"
-                    />
-                  ) : (
-                    <div className="flex size-16 items-center justify-center rounded-lg bg-secondary text-base font-semibold text-muted-foreground ring-1 ring-border sm:size-24 sm:text-lg">
-                      {item.name.slice(0, 1) || "?"}
-                    </div>
-                  )}
-                  <span className="max-w-20 truncate text-center text-xs text-muted-foreground sm:max-w-32">
-                    {item.name}
-                  </span>
-                </div>
-              ))}
+              {itemsByTier.get(tier.id)?.map((item) =>
+                item.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={item.id}
+                    src={item.image_url}
+                    alt=""
+                    loading="lazy"
+                    className="max-h-16 max-w-20 rounded-lg bg-secondary ring-1 ring-border sm:max-h-24 sm:max-w-32"
+                  />
+                ) : (
+                  <div
+                    key={item.id}
+                    className="flex size-16 items-center justify-center rounded-lg bg-secondary text-base font-semibold text-muted-foreground ring-1 ring-border sm:size-24 sm:text-lg"
+                  >
+                    ?
+                  </div>
+                ),
+              )}
             </div>
           </div>
         ))}

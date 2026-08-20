@@ -149,7 +149,6 @@ export async function importFromMintier(sourceUrl: string) {
         return {
           board_id: board.id,
           tier_id: tierIdByLabel.get(c.rank) ?? null,
-          name: c.caption?.trim() || "",
           image_url: publicUrl,
           position: c.position,
         };

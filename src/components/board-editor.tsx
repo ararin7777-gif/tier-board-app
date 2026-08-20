@@ -36,7 +36,6 @@ import { TierRow } from "@/components/tier-row";
 
 type ItemRow = {
   id: string;
-  name: string;
   image_url: string | null;
   tier_id: string | null;
   position: number;

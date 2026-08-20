@@ -136,11 +136,8 @@ export async function setCoverImage(boardId: string, imageUrl: string | null) {
   revalidatePath("/boards");
 }
 
-export async function createItems(
-  boardId: string,
-  items: { name: string; imageUrl: string }[],
-) {
-  if (items.length === 0) return;
+export async function createItems(boardId: string, imageUrls: string[]) {
+  if (imageUrls.length === 0) return;
   const supabase = await createClient();
 
   const { data: existing } = await supabase
@@ -153,12 +150,11 @@ export async function createItems(
     .maybeSingle();
 
   let nextPosition = (existing?.position ?? -10) + 10;
-  const rows = items.map((item) => {
+  const rows = imageUrls.map((imageUrl) => {
     const row = {
       board_id: boardId,
       tier_id: null,
-      name: item.name,
-      image_url: item.imageUrl,
+      image_url: imageUrl,
       position: nextPosition,
     };
     nextPosition += 10;

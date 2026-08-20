@@ -14,12 +14,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 
 type PendingItem = {
   id: string;
-  name: string;
   status: "uploading" | "done" | "error";
   imageUrl?: string;
   previewUrl: string;
@@ -56,7 +54,6 @@ export function AddItemsDialog({
 
     const newItems: PendingItem[] = fileArray.map((file) => ({
       id: crypto.randomUUID(),
-      name: file.name.replace(/\.[^/.]+$/, ""),
       status: "uploading",
       previewUrl: URL.createObjectURL(file),
     }));
@@ -95,12 +92,6 @@ export function AddItemsDialog({
     );
   };
 
-  const updateName = (id: string, name: string) => {
-    setPendingItems((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, name } : p)),
-    );
-  };
-
   const removeItem = (id: string) => {
     setPendingItems((prev) => prev.filter((p) => p.id !== id));
   };
@@ -113,7 +104,7 @@ export function AddItemsDialog({
     try {
       await createItems(
         boardId,
-        ready.map((p) => ({ name: p.name, imageUrl: p.imageUrl! })),
+        ready.map((p) => p.imageUrl!),
       );
       toast.success(`${ready.length}件のアイテムを追加しました`);
       setPendingItems([]);
@@ -144,7 +135,7 @@ export function AddItemsDialog({
         <DialogHeader>
           <DialogTitle>アイテムを追加</DialogTitle>
           <DialogDescription>
-            画像を複数選択してまとめてアップロードできます。名前は登録前に編集できます。
+            画像を複数選択してまとめてアップロードできます。
           </DialogDescription>
         </DialogHeader>
 
@@ -163,37 +154,33 @@ export function AddItemsDialog({
         {pendingItems.length > 0 && (
           <div className="grid max-h-72 grid-cols-3 gap-3 overflow-y-auto sm:grid-cols-4">
             {pendingItems.map((item) => (
-              <div key={item.id} className="flex flex-col gap-1">
-                <div className="relative aspect-square overflow-hidden rounded-lg bg-secondary">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.previewUrl}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                  {item.status === "uploading" && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                      <Loader2 className="size-5 animate-spin text-white" />
-                    </div>
-                  )}
-                  {item.status === "error" && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-destructive/70 text-xs text-white">
-                      失敗
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => removeItem(item.id)}
-                    className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white"
-                  >
-                    <X className="size-3" />
-                  </button>
-                </div>
-                <Input
-                  value={item.name}
-                  onChange={(e) => updateName(item.id, e.target.value)}
-                  className="h-7 px-2 text-xs"
+              <div
+                key={item.id}
+                className="relative aspect-square overflow-hidden rounded-lg bg-secondary"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={item.previewUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
                 />
+                {item.status === "uploading" && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                    <Loader2 className="size-5 animate-spin text-white" />
+                  </div>
+                )}
+                {item.status === "error" && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-destructive/70 text-xs text-white">
+                    失敗
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => removeItem(item.id)}
+                  className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white"
+                >
+                  <X className="size-3" />
+                </button>
               </div>
             ))}
           </div>
